@@ -112,7 +112,9 @@ void Application::InitOpenGlBuffers() {
 
     GLuint colorParticlesBuffer;
     ::glGenBuffers(1, &colorParticlesBuffer);
-    ::glBindBuffer(GL_ARRAY_BUFFER, colorParticlesBuffer); {
+    ::glBindBuffer(GL_ARRAY_BUFFER, colorParticlesBuffer);
+
+    {
         assert(m_particles.GetBufferSize() <= UINT32_MAX);
         const auto bufferSize = static_cast<uint32_t>(m_particles.GetBufferSize());
 
@@ -172,7 +174,7 @@ ColorParticle Application::CreateParticle() {
 
 ParticleData Application::CreateParticleData(float lifeOffset) {
     return {
-        .speed = { m_dist(m_mt), m_dist(m_mt), m_dist(m_mt) },
+        .speed = {m_dist(m_mt), m_dist(m_mt), m_dist(m_mt)},
         .life = lifeOffset + m_dist(m_mt)
     };
 }
@@ -187,26 +189,11 @@ void Application::SetCameraLocation(float distance, float hAngle, float vAngle) 
 }
 
 
-void Application::Upload() {
-    if (m_particlesUpdated) {
-        assert(m_particles.GetBufferSize() <= UINT32_MAX);
-        const auto bufferSize = static_cast<uint32_t>(m_particles.GetBufferSize());
+void Application::BeforeRender(float deltaTime) {
+    UpdatePosition(deltaTime);
 
-        ::glBufferSubData(GL_ARRAY_BUFFER, 0, bufferSize, m_particles.GetParticlesBuffer());
-
-        m_particlesUpdated = false;
-    }
-
-    if (m_cameraUpdated) {
-        const auto view = m_camera.View();
-        const auto projection = m_camera.Projection();
-
-        ::glUniform3f(m_cameraRightLocation, view[0][0], view[1][0], view[2][0]);
-        ::glUniform3f(m_cameraUpLocation, view[0][1], view[1][1], view[2][1]);
-        ::glUniformMatrix4fv(m_viewProjectionLocation, 1, GL_FALSE, glm::value_ptr(projection * view));
-
-        m_cameraUpdated = false;
-    }
+    if (m_cameraUpdated)
+        UploadPosition();
 }
 
 
@@ -217,9 +204,11 @@ void Application::Render() const {
 }
 
 
-void Application::Update(float deltaTime) {
+void Application::AfterRender(float deltaTime) {
     UpdateParticles(deltaTime);
-    UpdatePosition(deltaTime);
+
+    if (m_particlesUpdated)
+        UploadParticles();
 }
 
 void Application::UpdateParticles(float deltaTime) {
@@ -281,8 +270,27 @@ void Application::UpdatePosition(float deltaTime) {
     m_cameraUpdated = true;
 }
 
+void Application::UploadParticles() {
+    assert(m_particles.GetBufferSize() <= UINT32_MAX);
 
-Application::Application(const ApplicationConfiguration& config): m_particles(0) {
+    const auto bufferSize = static_cast<uint32_t>(m_particles.GetBufferSize());
+    ::glBufferSubData(GL_ARRAY_BUFFER, 0, bufferSize, m_particles.GetParticlesBuffer());
+
+    m_particlesUpdated = false;
+}
+
+void Application::UploadPosition() {
+    const auto view = m_camera.View();
+    const auto projection = m_camera.Projection();
+
+    ::glUniform3f(m_cameraRightLocation, view[0][0], view[1][0], view[2][0]);
+    ::glUniform3f(m_cameraUpLocation, view[0][1], view[1][1], view[2][1]);
+    ::glUniformMatrix4fv(m_viewProjectionLocation, 1, GL_FALSE, glm::value_ptr(projection * view));
+
+    m_cameraUpdated = false;
+}
+
+Application::Application(const ApplicationConfiguration& config) : m_particles(0) {
     InitWindow(config.width, config.height, config.name);
     InitParticles(config.particleCount);
     InitShaders();
@@ -300,17 +308,21 @@ Application::~Application() noexcept {
 int Application::Run() {
     double lastTime = glfwGetTime();
     while (!::glfwWindowShouldClose(m_window)) {
-        Upload();
+        const double newTime = glfwGetTime();
+        const auto deltaTime = static_cast<float>(newTime - lastTime);
+
         Render();
+
+        ::glFlush();
+
+        AfterRender(deltaTime);
 
         ::glfwPollEvents();
         ::glfwSwapBuffers(m_window);
 
-        const double newTime = glfwGetTime();
-        const auto deltaTime = static_cast<float>(newTime - lastTime);
-        lastTime = newTime;
+        BeforeRender(deltaTime);
 
-        Update(deltaTime);
+        lastTime = newTime;
     }
 
     return 0;

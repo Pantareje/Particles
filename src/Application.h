@@ -47,12 +47,15 @@ class Application final {
     ParticleData CreateParticleData(float lifeOffset);
     void SetCameraLocation(float distance, float hAngle, float vAngle);
 
-    void Upload();
+    void BeforeRender(float deltaTime);
     void Render() const;
-    void Update(float deltaTime);
+    void AfterRender(float deltaTime);
 
     void UpdateParticles(float deltaTime);
     void UpdatePosition(float deltaTime);
+
+    void UploadParticles();
+    void UploadPosition();
 
 public:
     explicit Application(const ApplicationConfiguration& config);
