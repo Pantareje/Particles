@@ -62,12 +62,14 @@ void Application::InitParticles(size_t particleCount) {
 }
 
 void Application::InitShaders() {
+    constexpr const char* vertexShaderSources[] = { PARTICLE_VS };
     const unsigned int vertexShader = ::glCreateShader(GL_VERTEX_SHADER);
-    ::glShaderSource(vertexShader, 1, &PARTICLE_VS, nullptr);
+    ::glShaderSource(vertexShader, 1, vertexShaderSources, nullptr);
     ::glCompileShader(vertexShader);
 
+    constexpr const char* fragmentShaderSources[] = { PARTICLE_FS };
     const unsigned int fragmentShader = ::glCreateShader(GL_FRAGMENT_SHADER);
-    ::glShaderSource(fragmentShader, 1, &PARTICLE_FS, nullptr);
+    ::glShaderSource(fragmentShader, 1, fragmentShaderSources, nullptr);
     ::glCompileShader(fragmentShader);
 
     const unsigned int shaderProgram = ::glCreateProgram();
@@ -174,7 +176,7 @@ ColorParticle Application::CreateParticle() {
 
 ParticleData Application::CreateParticleData(float lifeOffset) {
     return {
-        .speed = {m_dist(m_mt), m_dist(m_mt), m_dist(m_mt)},
+        .speed = { m_dist(m_mt), m_dist(m_mt), m_dist(m_mt) },
         .life = lifeOffset + m_dist(m_mt)
     };
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 // language=glsl
-constexpr auto PARTICLE_VS = static_cast<const char*>(R"(
+constexpr char PARTICLE_VS[] = R"(
     #version 330 core
 
     layout (location = 0) in vec3 vert;
@@ -23,10 +23,10 @@ constexpr auto PARTICLE_VS = static_cast<const char*>(R"(
         vec3 vertexPos = center + size * (cameraRight * vert.x + cameraUp * vert.y);
         gl_Position = viewProjection * vec4(vertexPos, 1.0f);
     }
-)");
+)";
 
 // language=glsl
-constexpr auto PARTICLE_FS = static_cast<const char*>(R"(
+constexpr char PARTICLE_FS[] = R"(
     #version 330 core
 
     in vec4 ParticleColor;
@@ -37,4 +37,4 @@ constexpr auto PARTICLE_FS = static_cast<const char*>(R"(
     {
         color = ParticleColor;
     }
-)");
+)";
