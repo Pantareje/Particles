@@ -12,7 +12,7 @@
 #include <random>
 
 class Application final {
-    std::mt19937 m_mt { std::random_device {}() };
+    std::mt19937 m_mt { std::random_device()() };
     std::uniform_real_distribution<float> m_dist { 0.0f, 1.0f };
 
     GLFWwindow* m_window { nullptr };

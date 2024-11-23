@@ -24,7 +24,8 @@ void Application::InitWindow(uint16_t width, uint16_t height, const char* name) 
     int res;
 
     res = ::glfwInit();
-    if (!res) throw std::exception();
+    if (!res)
+        throw std::exception();
 
     ::glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     ::glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -32,7 +33,8 @@ void Application::InitWindow(uint16_t width, uint16_t height, const char* name) 
     ::glfwWindowHint(GLFW_DEPTH_BITS, 24);
 
     m_window = ::glfwCreateWindow(width, height, name, nullptr, nullptr);
-    if (!m_window) throw std::exception();
+    if (!m_window)
+        throw std::exception();
 
     ::glfwSetWindowUserPointer(m_window, this);
 
@@ -40,7 +42,8 @@ void Application::InitWindow(uint16_t width, uint16_t height, const char* name) 
     ::glfwSetFramebufferSizeCallback(m_window, FramebufferSizeCallback);
 
     res = ::gladLoadGLLoader(reinterpret_cast<GLADloadproc>(::glfwGetProcAddress));
-    if (!res) throw std::exception();
+    if (!res)
+        throw std::exception();
 
 #ifndef NDEBUG
     ::glEnable(GL_DEBUG_OUTPUT);
@@ -302,7 +305,9 @@ Application::Application(const ApplicationConfiguration& config) : m_particles(0
 }
 
 Application::~Application() noexcept {
-    if (m_window) ::glfwDestroyWindow(m_window);
+    if (m_window)
+        ::glfwDestroyWindow(m_window);
+
     ::glfwTerminate();
 }
 
