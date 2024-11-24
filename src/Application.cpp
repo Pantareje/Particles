@@ -317,9 +317,11 @@ int Application::Run(const ApplicationConfiguration& config) {
 
         AfterRender(deltaTime);
 
-        ::glfwPollEvents();
         ::glfwSwapBuffers(m_window);
+        ::glfwPollEvents();
 
+        // Normalmente, es conveniente llamar a BeforeRender antes del primer renderizado.
+        // El código en este ejemplo está diseñado para funcionar nada más ser iniciado.
         BeforeRender(deltaTime);
 
         lastTime = newTime;
