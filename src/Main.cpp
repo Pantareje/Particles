@@ -6,8 +6,8 @@ namespace {
             .particleCount = 150'000
         };
 
-        Application app(config);
-        return app.Run();
+        Application app;
+        return app.Run(config);
     }
 }
 

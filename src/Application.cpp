@@ -295,24 +295,17 @@ void Application::UploadPosition() {
     m_cameraUpdated = false;
 }
 
-Application::Application(const ApplicationConfiguration& config) : m_particles(0) {
+Application::Application() : m_particles(0) {}
+
+int Application::Run(const ApplicationConfiguration& config) {
     InitWindow(config.width, config.height, config.name);
+
     InitParticles(config.particleCount);
     InitShaders();
     InitOpenGlBuffers();
 
     SetCameraLocation(m_cameraDistance, m_cameraHAngle, m_cameraVAngle);
-}
 
-Application::~Application() noexcept {
-    if (m_window)
-        ::glfwDestroyWindow(m_window);
-
-    ::glfwTerminate();
-}
-
-
-int Application::Run() {
     double lastTime = glfwGetTime();
     while (!::glfwWindowShouldClose(m_window)) {
         const double newTime = glfwGetTime();
@@ -331,6 +324,8 @@ int Application::Run() {
 
         lastTime = newTime;
     }
+
+    ::glfwTerminate();
 
     return 0;
 }

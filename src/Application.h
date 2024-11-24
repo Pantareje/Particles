@@ -59,10 +59,9 @@ class Application final {
     void UploadPosition();
 
 public:
-    explicit Application(const ApplicationConfiguration& config);
-    ~Application() noexcept;
+    Application();
 
-    int Run();
+    int Run(const ApplicationConfiguration& config);
 
 private:
     static void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
